@@ -29,3 +29,6 @@ pip-log.txt
 # Python environment files
 python_env
 
+# Junk
+*.swp
+

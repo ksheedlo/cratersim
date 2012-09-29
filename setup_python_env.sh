@@ -21,6 +21,12 @@ pip install matplotlib==1.1.1
 check
 pip install wsgiref==0.1.2
 check
+pip install logilab-astng==0.24.0
+check
+pip install logilab-common==0.58.1
+check
+pip install pylint==0.25.2
+check
 
 echo "################################################################################"
 echo "#"

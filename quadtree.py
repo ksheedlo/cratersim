@@ -105,7 +105,7 @@ class QuadTree:
             return 1
         if self.child is None:
             return 0
-        return sum(map(len, self.child))
+        return sum([len(c) for c in self.child])
 
     def _subdivide(self):
         '''
@@ -187,7 +187,7 @@ class QuadTree:
         points = []
         if self.p is not None:
             if _range_contains_point(x_min, y_min, x_max, y_max, self.p[0], self.p[1]):
-                points.append(p)
+                points.append(self.p)
         if self.child is not None:
             for c in self.child:
                 if c.bounds_intersect_area(x_min, y_min, x_max, y_max):
@@ -207,7 +207,32 @@ class TestQuadtree(unittest.TestCase):
         # And no others.
         self.assertEqual(len(tree), len(expect_list))
 
+    def assert_list_contents_no_ordering(self, test_list, expect_list):
+        self.assertEqual(len(test_list), len(expect_list))
+        for e in expect_list:
+            self.assertIn(e, test_list)
+
     def test_insert(self):
+        tree = QuadTree(0.0, 0.0, 100.0, 100.0)
+        self.assertTrue(tree.insert(5.0, 3.0))
+        self.assertTrue(tree.insert(42.0, 13.37))
+        self.assertTrue(tree.insert(11.11, 99.99))
+        self.assertTrue(tree.insert(5.0, 8.0))
+
+        expect = [
+            (5.0, 3.0),
+            (42.0, 13.37),
+            (11.11, 99.99), 
+            (5.0, 8.0)
+        ]
+
+        self.assert_quadtree_contents(tree, expect)
+
+        # Illegal insert
+        self.assertFalse(tree.insert(101.1, 3.3))
+        self.assert_quadtree_contents(tree, expect)
+
+    def test_remove(self):
         tree = QuadTree(0.0, 0.0, 100.0, 100.0)
         tree.insert(5.0, 3.0)
         tree.insert(42.0, 13.37)
@@ -223,10 +248,32 @@ class TestQuadtree(unittest.TestCase):
 
         self.assert_quadtree_contents(tree, expect)
 
-        # Illegal insert
-        tree.insert(101.1, 3.3)
-        self.assert_quadtree_contents(tree, expect)
+        self.assertTrue(tree.remove(42.0, 13.37))
 
+        expect = [
+            (5.0, 3.0),
+            (11.11, 99.99), 
+            (5.0, 8.0)
+        ]
+        
+        self.assert_quadtree_contents(tree, expect)
+        self.assertFalse(tree.remove(5.0, 4.0))
+
+    def test_query_range(self):
+        tree = QuadTree(0.0, 0.0, 100.0, 100.0)
+        tree.insert(5.0, 3.0)
+        tree.insert(42.0, 13.37)
+        tree.insert(11.11, 99.99)
+        tree.insert(5.0, 8.0)
+        tree.insert(70.0, 30.0)
+
+        expect = [
+            (5.0, 8.0),
+            (42.0, 13.37)
+        ]
+
+        result = tree.query_range(3.0, 5.0, 50.0, 50.0)
+        self.assert_list_contents_no_ordering(result, expect)
 
 if __name__ == "__main__":
     unittest.main()

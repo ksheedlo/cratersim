@@ -32,3 +32,6 @@ python_env
 # Junk
 *.swp
 
+# Simulation results, plots etc.
+*.png
+

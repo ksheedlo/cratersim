@@ -10,7 +10,6 @@
 ################################################################################
 
 import matplotlib
-matplotlib.use("Agg")
 
 import numpy
 import random
@@ -41,7 +40,7 @@ def crater(craterset):
     result.add((crater_x, crater_y))
     return result
 
-def render(craterset, filename):
+def render(craterset, filename, t):
     '''
     Draws the current crater state and outputs to the named file.
 
@@ -54,6 +53,12 @@ def render(craterset, filename):
     ]
     for circle in circles:
         axes.add_artist(circle)
+    axes.set_ylim((0, 500))
+    axes.set_xlim((0, 500))
+    axes.set_aspect(1.0)
+    axes.set_title('Cratering over study area at t = {0}'.format(t))
+    axes.set_xlabel('X (km)')
+    axes.set_ylabel('Y (km)')
     fig.savefig(filename, dpi=220)
 
 def main():
@@ -66,10 +71,26 @@ def main():
         if counts[i / 2] * 1.05 > counts[i]:
             break
         if i % 100 == 0:
-            render(craterset, 'step{0}.png'.format(i))
+            render(craterset, 'step{0}.png'.format(i), i * 1000)
         i += 1
     print 'Time: %d years\tCrater count: %d' % (i * 1000, counts[i])
-    render(craterset, 'final.png')
+    render(craterset, 'final.png', i * 1000)
+    counts_array = numpy.array(counts, numpy.int32)
+    ts_array = numpy.array(range(len(counts)), numpy.int32)
+
+#    matplotlib.pyplot.figure(2)
+#    matplotlib.pyplot.plot(ts_array, counts_array)
+#    matplotlib.pyplot.xlabel('Time in years')
+#    matplotlib.pyplot.ylabel('Crater count')
+#    matplotlib.pyplot.title('Crater count to saturation')
+#    matplotlib.pyplot.savefig('density.png', dpi=220)
+    fig = matplotlib.pyplot.figure()
+    axes = fig.gca()
+    axes.plot(ts_array, counts_array)
+    axes.set_xlabel('Time (10^3 years)')
+    axes.set_ylabel('Crater count')
+    axes.set_title('Crater count to saturation')
+    fig.savefig('density.png', dpi=220)
 
 if __name__ == "__main__":
     main()

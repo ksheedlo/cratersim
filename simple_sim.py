@@ -65,6 +65,8 @@ def main():
     craterset = set()
     counts = [0]
     i = 1
+    print 'Time (y) | Craters'
+    print '---------|--------'
     while True:
         craterset = crater(craterset)
         counts.append(len(craterset))
@@ -72,18 +74,14 @@ def main():
             break
         if i % 100 == 0:
             render(craterset, 'step{0}.png'.format(i), i * 1000)
+        if i % 10 == 0:
+            print '%5d000 | %7d' % (i, len(craterset))
         i += 1
     print 'Time: %d years\tCrater count: %d' % (i * 1000, counts[i])
     render(craterset, 'final.png', i * 1000)
     counts_array = numpy.array(counts, numpy.int32)
     ts_array = numpy.array(range(len(counts)), numpy.int32)
 
-#    matplotlib.pyplot.figure(2)
-#    matplotlib.pyplot.plot(ts_array, counts_array)
-#    matplotlib.pyplot.xlabel('Time in years')
-#    matplotlib.pyplot.ylabel('Crater count')
-#    matplotlib.pyplot.title('Crater count to saturation')
-#    matplotlib.pyplot.savefig('density.png', dpi=220)
     fig = matplotlib.pyplot.figure()
     axes = fig.gca()
     axes.plot(ts_array, counts_array)
